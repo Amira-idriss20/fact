@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+       <h1>facture de vente simplifier</h1>
+       
+            <table>
+                <tr>
+                    <td>
+                        <form onsubmit="event.preventDefault(); onFormSubmit()">
+        
+                            <div>
+                                <label for="num">numero d'article</label>
+                                <input type="text" name="num" id="num">
+                            </div>
+                            <div>
+                                <label for="descrip">la description* <label class="validation-error hide"  id="descripValidationError" >ce champs est obligatoire</label> </label>
+                                <input type="text" name="descrip" id="descrip">
+                            </div>                  
+                            <div>
+                                <label for="prix">prix unitaire</label>
+                                <input type="text" name="prix" id="prix">
+                            </div>
+                            <div>
+                                <label for="quantité">quantité</label>
+                                <input type="text" name="quantité" id="quantité">
+                            </div>
+                            <div>
+                                <label for="montants">montants</label>
+                                <input type="text" name="montants" id="montants">
+                            </div>
+                            
+                            <div>
+                                <input class="form-action-buttons submit" type="submit" value="Enregistrer">
+                            </div>
+                            
+                        </form>
+                    </td>
+                    <td>
+                        <table class="list" id="emplist">
+                            <thead>
+                                <tr>
+                                    <td class="thead">numero d'article</td>
+                                    <td class="thead">description</td>
+                                    <td class="thead">prix unitaire</td>
+                                    <td class="thead">quantité</td>
+                                    <td class="thead">montants</td>
+                                    <td class="thead">Action</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
