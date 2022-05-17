@@ -1,105 +1,137 @@
-var selectedRow = null;
+'use strict'
 
-function onFormSubmit(){
-    console.log(formData);
-    if(validate()){
-        var formData = readFormData();
-        console.log(formData);
-        if(selectedRow == null){
-            insertNewRecord(formData);
-        }else{
-            updateRecord(formData);
-        }
-        
-        resetForm();
-    }
-}
+		const openModel = ()=> document.getElementById('model').classList.add('active')
 
-function readFormData(){
+		const closeModel = ()=> {
+			clearFields()
+			document.getElementById('model').classList.remove('active')
+		}
 
-    var formData = {};
-    formData["num"] = document.getElementById("num").value;
-    formData["descrip"] = document.getElementById("descrip").value;
-    formData["prix"] = document.getElementById("prix").value;
-    formData["quantité"] = document.getElementById("quantité").value;
-    formData["montants"] = document.getElementById("montants").value;
-    
+		const getLocalStorage = ()=> JSON.parse(localStorage.getItem('db_student'))??[]
+		const setLocalStorage = (db_student)=> localStorage.setItem('db_student', JSON.stringify(db_student))
 
-    return formData;
-}
+		const readStudent = ()=> getLocalStorage()
 
-function insertNewRecord(data){
-    var table = document.getElementById("emplist").getElementsByTagName('tbody')[0];
-    var newRow = table.insertRow(table.length);
+		const createStudent = (student)=> {
+			const db_student = getLocalStorage()
+			db_student.push(student)
+			setLocalStorage(db_student)
+		} 
 
-    cell2 = newRow.insertCell(0);
-    cell2.innerHTML = data.num;
+		const updateStudent = (index, student)=> {
+			const db_student = readStudent()
+			db_student[index] = student
+			setLocalStorage(db_student)
+		}
 
-    cell1 = newRow.insertCell(1);
-    cell1.innerHTML = data.descrip;
 
-    cell3 = newRow.insertCell(2);
-    cell3.innerHTML = data.prix;
+		const deleteStudent = (index)=> {
+			const db_student = readStudent()
+			db_student.splice(index, 1)
+			setLocalStorage(db_student)
+		}
 
-    cell4 = newRow.insertCell(3);
-    cell4.innerHTML = data.quantité;
+		const isValidFields = ()=> {
+		   return document.getElementById('form').reportValidity()
+		}
 
-    cell4 = newRow.insertCell(4);
-    cell4.innerHTML = data.montants;
+		const clearFields = ()=> {
+			const fields = document.querySelectorAll('.model-field')
+			fields.forEach(field => field.value = "")
+		} 
 
-    cell4 = newRow.insertCell(6);
-    cell4.innerHTML = `<a onClick="onEdit(this)">modifier</a>
-                        <a  onClick="onDelete(this)">supprimer</a>`;
-}
+		const saveStudent = ()=>{
+			if(isValidFields()){
+				const student = {
+					num: document.getElementById('num').value,
+					descrip: document.getElementById('descrip').value,
+					prix: document.getElementById('prix').value,
+					quant: document.getElementById('quant').value,
+					mont: document.getElementById('mont').value,
+					
+				}
+				//console.log('The Cadastral student: ' + student)
+				const index = document.getElementById('num').dataset.index
+				if(index == 'new'){
+					createStudent(student)
+					listStudent()
+					closeModel()
+				}else{
+					updateStudent(index, student)
+					listStudent()
+					closeModel()
+				}
+			}
+		}
 
-function resetForm(){
-    document.getElementById('num').value = '';
-    document.getElementById('descrip').value = '';
-    document.getElementById('prix').value = '';
-    document.getElementById('quantité').value = '';
-    document.getElementById('montants').value = '';
-    selectedRow = null;
-}
 
-function onEdit(td){
-    selectedRow = td.parentElement.parentElement;
-    document.getElementById('num').value = selectedRow.cells[0].innerHTML;
-    document.getElementById('descrip').value = selectedRow.cells[1].innerHTML;
-    document.getElementById('prix').value = selectedRow.cells[2].innerHTML;
-    document.getElementById('quantité').value = selectedRow.cells[3].innerHTML;
-    document.getElementById('montants').value = selectedRow.cells[4].innerHTML;
-    
-}
+		const createRow = (student, index)=> {
+			const newRow = document.createElement('tr')
+			newRow.innerHTML = `
+				<td>${student.num}</td>
+				<td>${student.descrip}</td>
+				<td>${student.prix}</td>
+				<td>${student.quant}</td>
+				<td>${student.mont}</td>
+				
+				<td>
+					<button type="button" class="button green" id="edit-${index}">Edit</button>
+					<button type="button" class="button red" id="delete-${index}">Delete</button>
+				</td>
+			`
+			document.querySelector('#tblStudent>tbody').appendChild(newRow)
+		}
 
-function updateRecord(formData){
+		const crearTable = ()=> {
+			const rows = document.querySelectorAll('#tblStudent>tbody tr')
+			rows.forEach(row => row.parentNode.removeChild(row))
+		}
 
-    selectedRow.cells[0].innerHTML = formData.num;
-    selectedRow.cells[1].innerHTML = formData.descrip;
-    selectedRow.cells[2].innerHTML = formData.prix;
-    selectedRow.cells[3].innerHTML = formData.quantité;
-    selectedRow.cells[4].innerHTML = formData.montants;
-    
+		const listStudent = ()=> {
+			const students =  readStudent()
+			// console.log(students)
+			crearTable()
+			students.forEach(createRow)
+		}
 
-function onDelete(td){
-    if(confirm('vous etes sur de vouloir suprimer?')){
-        row = td.parentElement.parentElement;
-        document.getElementById("emplist").deleteRow(row.rowIndex);
-        resetForm();
-    }
-    
-}
+		const fillFields = (student)=> {
+			document.getElementById('num').value = student.num
+			document.getElementById('descrip').value = student.descrip
+			document.getElementById('prix').value = student.prix
+			document.getElementById('quant').value = student.quant
+			document.getElementById('mont').value = student.mont
+			
 
-function validate(){
-    isValid = true;
-    if(document.getElementById('descrip').value == ""){
-        isValid = false;
-        document.getElementById('descripValidationError').classList.remove("hide");
-    }else{
-        isValid = true;
-        if(!document.getElementById('descripValidationError').classList.remove("hide")){
-            document.getElementById('descripValidationError').classList.add("hide");
-        }
-    }
+			document.getElementById('num').dataset.index = student.index
+		}
 
-    return isValid;
-}
+		const editStudent = (index)=>{
+			const student = readStudent()[index]
+			student.index = index
+			fillFields(student)
+			openModel()
+		}
+
+		const editDelete = (event)=>{
+			if(event.target.type == 'button'){
+				const [action, index] = event.target.id.split('-')
+				if(action == 'edit'){
+					editStudent(index)
+				}else{
+					const student = readStudent()[index]
+					const response = confirm(`Are you sure to delete the student ${student.name}`)
+					if(response){
+						deleteStudent(index)
+						listStudent()
+					}
+				}
+			}
+		}
+
+		listStudent()
+
+		document.getElementById('idStudent').addEventListener('click', openModel)
+		document.getElementById('modelClose').addEventListener('click', closeModel)
+		document.getElementById('save').addEventListener('click', saveStudent)
+		document.getElementById('cancel').addEventListener('click', closeModel)
+		document.querySelector('#tblStudent>tbody').addEventListener('click', editDelete)
